@@ -2,9 +2,9 @@
 puppet resource package git ensure=present
 puppet resource package apache2 ensure=present
 puppet resource service apache2 ensure=running
-puppet resource file /testdir/clone ensure=absent force=true
-puppet resource file /testdir ensure=directory
-puppet resource file /testdir/clone ensure=directory
-cd /testdir/clone
+puppet resource file /tmp/22050112/clone ensure=absent force=true
+puppet resource file /tmp/22050112 ensure=directory
+puppet resource file /tmp/22050112/clone ensure=directory
+cd /tmp/22050112/clone
 git clone https://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@github.com/waitat-rp/22050112_repo.git
 cp -p /testdir/clone/22050112_repo/22050112_index.html /var/www/html
