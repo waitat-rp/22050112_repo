@@ -1,0 +1,35 @@
+root@nagios> sudo htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
+
+root@nagios> sudo nano /etc/hosts
+--> add this line: 192.168.100.11	apacheweb.localdomain
+--> add this line: 192.168.100.12	postgresdb.localdomain
+
+root@nagios> docker run -d --name apache2-container -e TZ=SGT -p 8011:80 ubuntu/apache2:LTS
+root@nagios> docker exec -it apache2-container /bin/bash
+root@apacheweb> apt-get update
+root@apacheweb> apt-get install curl wget vim iputils-ping net-tools openssh-server
+
+root@nagios> docker network create –-subnet=192.168.100.0/24 customnetwork
+root@nagios> docker network inspect customnetwork
+
+root@nagios> docker commit apache2-container apache2-image
+
+root@nagios> docker run -d --privileged -h "apacheweb.localdomain" --name apacheweb --add-host "sddo-vm.localdomain:172.20.113.93" --ip "192.168.100.11" apache2-image
+
+root@nagios> docker run -d --privileged -h "apacheweb.localdomain" --name apacheweb --add-host "sddo-vm.localdomain:172.20.113.93" --ip "192.168.100.11" -e TZ=SGT -p 8011:80 ubuntu/apache2:latest
+
+root@nagios> docker network connect --ip "192.168.100.11" customnetwork apacheweb
+
+root@nagios> docker exec --privileged -it apacheweb /bin/bash
+
+root@apacheweb> apt update
+root@apacheweb> apt install openssh-server
+root@apacheweb> sudo nano /etc/ssh/sshd_config
+
+root@apacheweb> ufw allow ssh
+
+root@nagios> docker run --privileged -it client1 ubuntu:18.04 /bin/bash
+
+export RUNLEVEL=1
+printf '#!/bin/sh\nexit 0' > /usr/sbin/policy-rc.d
+
