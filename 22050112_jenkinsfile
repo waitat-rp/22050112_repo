@@ -17,7 +17,7 @@ pipeline {
                  sh '''#!/bin/bash
                  targets=22050112-websvr.localdomain;
                  locate_script='/tmp/22050112/clone/22050112_repo/22050112.script';
-                 bolt script run $locate_script -t $targets -u root -p ubuntu --no-host-key-check --run-as root;
+                 bolt script run $locate_script -t $targets -u admin -p password --no-host-key-check --run-as root;
                  '''
                  echo "22050112STG2: Push change to production web server updated"
           }
