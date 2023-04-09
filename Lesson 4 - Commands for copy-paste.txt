@@ -1,0 +1,113 @@
+root@apacheweb> vi /etc/ssh/sshd_config
+--> set "PermitRootLogin no"
+
+=== SSH Configurations ===
+dockeradm@sddo-vm> docker exec --privileged -it apacheweb /bin/bash
+
+Step 1. ApacheWeb:
+root@apacheweb> apt update
+root@apacheweb> apt install openssh-server 
+root@apacheweb> service ssh status
+root@apacheweb> service ssh restart
+root@apacheweb> adduser nagios 
+
+Step 2. Nagios Server:
+root@nagios-server> su - nagios
+nagios@nagios-server> ssh-keygen -t rsa -b 4096 -C "nagios@nagios-server.localdomain" 
+nagios@nagios-server> ssh-copy-id nagios@apacheweb 
+
+Step 3. ApacheWeb:
+root@apacheweb> vi /etc/ssh/sshd_config
+--> add/change-> PasswordAuthentication no
+--> add/change-> ChallengeResponseAuthentication no
+--> add/change-> UsePAM no
+
+root@apacheweb> service ssh restart 
+
+Step 4. Nagios Server:
+root@nagios-server> su - nagios
+nagios@nagios-server> ssh nagios@apacheweb <remote-commands>
+ssh nagios@apacheweb "ls -al"
+
+===
+
+dockeradm@sddo-vm> cd /usr/local/nagios/etc/objects
+
+dockeradm@sddo-vm> sudo vi localhost.cfg
+dockeradm@sddo-vm> sudo nano localhost.cfg
+dockeradm@sddo-vm> sudo gedit localhost.cfg
+
+dockeradm@sddo-vm> sudo systemctl restart nagios.service
+
+---
+localhost.cfg:
+
+define host {
+    use 		linux-server
+    host_name		apacheweb
+    alias		apacheweb.localdomain
+    address		192.168.100.11
+}
+
+define service {
+    use			local-service
+    host_name		apacheweb
+    service_description	PING
+    check_command	check_ping!100.0,20%!500.0,60%
+}
+
+define service {
+    use			local-service
+    host_name		apacheweb
+    service_description	SSH
+    check_command	check_ssh
+    notifications_enabled	0
+}
+ 
+define service {
+    use			local-service
+    host_name		apacheweb
+    service_description	HTTP
+    check_command	check_http
+    notifications_enabled	0
+}
+
+define service {
+    use			local-service
+    host_name		apacheweb
+    service_description	Current Users
+    check_command	check_local_users!20!50
+}
+
+define service {
+    use			local-service
+    host_name		apacheweb
+    service_description	Current Load
+    check_command	check_local_load!5.0,4.0,3.0!10.0,6.0,4.0
+}
+
+define hostgroup {
+    hostgroup_name	linux-servers
+    members		localhost,apacheweb
+}
+
+---
+
+dockeradm@sddo-vm> vim commands.cfg
+
+---
+commands.cfg:
+
+define command {
+    command_name	check_remote_load
+    command_line	/usr/bin/ssh $HOSTADDRESS$ $USER1$/check_load -w $ARG1$ -c $ARG2$
+}
+
+define service {
+    use			local-service
+    host_name		apacheweb
+    service_description	Current Remote Load
+    check_command	check_remote_load!5.0,4.0,3.0!10.0,6.0,4.0
+}
+
+---
