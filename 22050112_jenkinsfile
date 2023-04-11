@@ -15,11 +15,7 @@ pipeline {
           }
           steps {
                  sh '''#!/bin/bash
-                 puppet resource file /tmp/22050112/clone ensure=absent force=true;
-                  puppet resource file /tmp/22050112 ensure=directory;
-                  cd /tmp/22050112/clone;
-                  git clone https://github.com/waitat-rp/22050112_repo;
-
+              
                  targets=22050112-websvr.localdomain;
                  locate_script='/tmp/22050112/clone/22050112_repo/22050112.script';
                  bolt script run $locate_script -t $targets -u admin -p password --no-host-key-check --run-as root;
