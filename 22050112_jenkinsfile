@@ -41,7 +41,11 @@ pipeline {
                 echo "22050112STG4: Production web server testing completed"
           }
           }
-         
+          stage('22050112STG5') {
+          steps {
+            input('22050112STG5: Web server testing result has been inspected')
+          }
+          }
           
          
          stage('22050112STG6') {
