@@ -42,7 +42,8 @@ pipeline {
           }
           steps {
           sh '''#!/bin/bash
-	  curl -sI http://22050112-websvr.localdomain | head -n 1 > web-test-result.txt                
+	  curl -sI http://22050112-websvr.localdomain | head -n 1 > web-test-result.txt	  
+	  cat web-test-result.txt
 	    '''
                 echo "22050112STG4: Production web server testing completed"
           }
