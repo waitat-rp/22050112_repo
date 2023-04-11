@@ -34,7 +34,19 @@ pipeline {
           }
           }
           
-   
+   stage('22050112STG4') {
+          when {
+                not {
+                    branch "Aborted"
+                }
+          }
+          steps {
+          sh '''#!/bin/bash
+                curl –Is http://22050112-websvr.localdomain |head –n 1  > /tmp/web-test-result
+	    '''
+                echo "22050112STG4: Production web server testing completed"
+          }
+          }
           stage('22050112STG5') {
           steps {
             input('22050112STG5: Web server testing result has been inspected')
